@@ -7,25 +7,24 @@ def read_scores_from_stdin():
 par_score, player_score = read_scores_from_stdin()
 score_diff = [player_score[i]-v for i, v in enumerate(par_score)]
 score_str = []
-# print(score_diff)
+
+score_map = {
+  0: "パー",
+  -1: "バーディ",
+  -2: "イーグル",
+  -3: "アルバトロス",
+  -4: "コンドル",
+  1: "ボギー",
+}
+
 for i,v in enumerate(score_diff):
   if player_score[i] == 1:
     if par_score[i] == 5:
       score_str.append("コンドル")
     else:
       score_str.append("ホールインワン")
-  elif v == 0:
-    score_str.append("パー")
-  elif v == -1:
-    score_str.append("バーディ")
-  elif v == -2:
-    score_str.append("イーグル")
-  elif v == -3:
-    score_str.append("アルバトロス")
-  elif v == 1:
-    score_str.append("ボギー")
   elif v >= 2:
     score_str.append(f"{v}ボギー")
   else:
-    score_str.append(v)
+    score_str.append(score_map[v])
 print(",".join(score_str))
