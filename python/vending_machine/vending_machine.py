@@ -82,6 +82,7 @@ class VendingMachine:
 if __name__ == "__main__":
     suica = Suica()
     vm = VendingMachine()
+    suica.charge(300)
     try:
         juice_name = input(f"\n下記から飲み物を選んでください\n{', '.join(vm.get_juices())}\n")
         print(f"{juice_name}の在庫はあと{vm.get_stock(juice_name)}個です。")
