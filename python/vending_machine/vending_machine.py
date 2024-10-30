@@ -48,13 +48,14 @@ class VendingMachine:
 
     def dispense_item(self, juice_name):
         for v in self._inventory:
-            if v["juice"].get_name() == juice_name:
-                if v["stock"] > 0:
-                    v["stock"] -=1
-                    return
-                else:
-                    raise ValueError("在庫がありません。")
+            if v["juice"].get_name() != juice_name:
+                continue
+            if v["stock"] == 0:
+                raise ValueError("在庫がありません。")
+            v["stock"] -= 1
+            return
         raise ValueError("指定されたジュースは存在しません。")
+        
 
     def get_sales(self):
         return self._sales
@@ -65,22 +66,24 @@ class VendingMachine:
 
     def purchase(self, suica, juice_name):
         for v in self._inventory:
-            if v["juice"].get_name() == juice_name:
-                if v["stock"] <= 0:
-                    raise ValueError("在庫がありません。購入をキャンセルされました。")
-                suica.pay(v["juice"].get_price())
-                self.dispense_item(juice_name)
-                self._sales += v["juice"].get_price()
-                return f"{juice_name}を購入しました。"
+            if v["juice"].get_name() != juice_name:
+                continue
+            if v["stock"] == 0:
+                raise ValueError("在庫がありません。購入をキャンセルされました。")
+            suica.pay(v["juice"].get_price())
+            self.dispense_item(juice_name)
+            self._sales += v["juice"].get_price()
+            return f"{juice_name}を購入しました。"
         raise ValueError("指定されたジュースは存在しません。")
 
     def restock(self, juice_name, quantity):
         if quantity <= 0:
             raise ValueError("在庫数は1以上の数値である必要があります。")
         for v in self._inventory:
-            if v["juice"].get_name() == juice_name:
-                v["stock"] += quantity
-                return v["stock"]
+            if v["juice"].get_name() != juice_name:
+                continue
+            v["stock"] += quantity
+            return v["stock"]
         raise ValueError("指定されたジュースは存在しません。")
 
 if __name__ == "__main__":
@@ -94,6 +97,8 @@ if __name__ == "__main__":
         print(message)
         print(f"残高は{suica.get_balance()}円です。")
         print(f"{juice_name}の在庫はあと{vm.get_stock(juice_name)}個です。")
+        stock = vm.restock(juice_name, 5)
+        print(f"{juice_name}の在庫はあと{stock}個です。")
         print(f"売り上げは{vm.get_sales()}円です。")
     except ValueError as e:
         print("エラー:", e)
