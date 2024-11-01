@@ -32,52 +32,59 @@ class Juice:
 
 class VendingMachine:
     def __init__(self):
-        self._inventory = {
-            "ペプシ": {"juice": Juice("ペプシ", 150), "stock": 5},
-            "モンスター": {"juice": Juice("モンスター", 200), "stock": 5},
-            "いろはす": {"juice": Juice("いろはす", 120), "stock": 5},
-        }
+        self._inventory = [
+            {"juice": Juice("ペプシ", 150), "stock": 5},
+            {"juice": Juice("モンスター", 200), "stock": 5},
+            {"juice": Juice("いろはす", 120), "stock": 5},
+        ]
         self._sales = 0
 
     def get_stock(self, juice_name):
-        if juice_name not in self._inventory:
-            raise ValueError("持っている在庫がありません。")
-        return self._inventory[juice_name]["stock"]
+        for v in self._inventory:
+            if v["juice"].get_name() == juice_name:
+                stock = v["stock"]
+                return stock
+        raise ValueError("指定されたジュースは存在しません。")
 
     def dispense_item(self, juice_name):
-        if self._inventory[juice_name]["stock"] <= 0:
-            raise ValueError("在庫がありません。")
-        self._inventory[juice_name]["stock"] -= 1
+        for v in self._inventory:
+            if v["juice"].get_name() != juice_name:
+                continue
+            if v["stock"] == 0:
+                raise ValueError("在庫がありません。")
+            v["stock"] -= 1
+            return
+        raise ValueError("指定されたジュースは存在しません。")
+        
 
     def get_sales(self):
         return self._sales
 
     def get_juices(self):
-        return list(self._inventory.keys())
+        juices = [v["juice"].get_name() for v in self._inventory]
+        return juices
 
     def purchase(self, suica, juice_name):
-        if juice_name not in self._inventory:
-            raise ValueError("指定されたジュースは存在しません。")
-
-        juice = self._inventory[juice_name]["juice"]
-        if self._inventory[juice_name]["stock"] <= 0:
-            raise ValueError("在庫がありません。購入はキャンセルされました。")
-
-        suica.pay(juice.get_price())
-        self.dispense_item(juice_name)
-        self._sales += juice.get_price()
-        return f"{juice_name}を購入しました。"
+        for v in self._inventory:
+            if v["juice"].get_name() != juice_name:
+                continue
+            if v["stock"] == 0:
+                raise ValueError("在庫がありません。購入をキャンセルされました。")
+            suica.pay(v["juice"].get_price())
+            self.dispense_item(juice_name)
+            self._sales += v["juice"].get_price()
+            return f"{juice_name}を購入しました。"
+        raise ValueError("指定されたジュースは存在しません。")
 
     def restock(self, juice_name, quantity):
-        if juice_name not in self._inventory:
-            raise ValueError("指定したジュースは存在しません。")
-
         if quantity <= 0:
             raise ValueError("在庫数は1以上の数値である必要があります。")
-
-        self._inventory[juice_name]["stock"] += quantity
-        return self.get_stock(juice_name)
-
+        for v in self._inventory:
+            if v["juice"].get_name() != juice_name:
+                continue
+            v["stock"] += quantity
+            return v["stock"]
+        raise ValueError("指定されたジュースは存在しません。")
 
 if __name__ == "__main__":
     suica = Suica()
@@ -90,6 +97,8 @@ if __name__ == "__main__":
         print(message)
         print(f"残高は{suica.get_balance()}円です。")
         print(f"{juice_name}の在庫はあと{vm.get_stock(juice_name)}個です。")
+        stock = vm.restock(juice_name, 5)
+        print(f"{juice_name}の在庫はあと{stock}個です。")
         print(f"売り上げは{vm.get_sales()}円です。")
     except ValueError as e:
         print("エラー:", e)
