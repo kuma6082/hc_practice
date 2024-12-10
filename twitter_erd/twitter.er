@@ -1,0 +1,66 @@
+[users]
+*id {label: "bigint, not null"}
+email{label:"text, uniq"}
+name{label:"varchar(20), uniq"}
+phone_number{label:"varchar(15),uniq "}
+display_name{label:"varchar(20),not null" }
+biography{label:"text,null" }
+location{label:"text,null" }
+website{label:"varchar(255),null" }
+birthday{label:"date,null" }
+avatar_image_url{label:"text,null" }
+
+[tweets]
+*id {label: "bigint, not null"}
+user_id {label: "bigint, not null, FK(users)"}
+content{label: "varchar(140), not null"}
+created_at {label: "datetime, not null"}
+
+[likes]
+*id {label: "bigint, not null"}
+user_id {label: "bigint, not null, FK(users)"}
+tweet_id {label: "bigint, not null, FK(tweets)"}
+created_at {label: "datetime, not null"}
+
+[retweets]
+*id {label: "bigint, not null"}
+user_id {label: "bigint, not null, FK(users)"}
+tweet_id {label: "bigint, not null, FK(tweets)"}
+created_at {label: "datetime, not null"}
+
+[followers]
+*id {label: "bigint, not null"}
+follower_id {label: "bigint, not null, FK(users)"}
+followee_id {label: "bigint, not null, FK(users)"}
+created_at {label: "datetime, not null"}
+
+[messages]
+*id {label: "bigint, not null"}
+sender_id{label: "bigint, not null, FK(users)"}
+recipient_id {label: "bigint, not null, FK(users)"}
+content {label: "text, not null"}
+created_at {label: "datetime, not null"}
+
+[notifications]
+*id {label: "bigint, not null"}
+user_id {label: "bigint, not null, FK(users)"}
+type {label: "varchar, not null"}
+created_at {label: "datetime, not null"}
+
+[bookmarks]
+*id {label: "bigint, not null"}
+user_id {label: "bigint, not null, FK(users)"}
+tweet_id {label: "bigint, not null, FK(tweets)"}
+created_at {label: "datetime, not null"}
+
+# Relationships
+users 1--* tweets
+users 1--* likes
+tweets 1--* likes
+users 1--* retweets
+tweets 1--* retweets
+users *--* followers
+users *--* messages
+users 1--* notifications
+users 1--* bookmarks
+tweets 1--* bookmarks
